@@ -42,7 +42,7 @@ action :create do
       password = nil
       Chef::Log.info "#{new_resource.name} - no authentication data found"
     end
-    Chef::Nexus.nexus(node).create_repository(new_resource.description, true, new_resource.url, new_resource.name, new_resource.policy, nil, username, password)
+    Chef::Nexus.nexus(node).create_repository(new_resource.description, true, new_resource.url, new_resource.name, new_resource.policy, new_resource.repo_provider, username, password)
     set_publisher if new_resource.publisher
     set_subscriber if new_resource.subscriber
     new_resource.updated_by_last_action(true)
