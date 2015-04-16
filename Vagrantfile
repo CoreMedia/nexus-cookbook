@@ -12,6 +12,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 8443, host: 8443
 
   config.vm.provision :chef_solo do |chef|
+    chef.log_level = ENV.fetch('CHEF_LOG', 'info').downcase.to_sym
     chef_dir = File.join(Dir.home, ".chef")
     chef.data_bags_path = File.join(chef_dir, "data_bags")
     chef.encrypted_data_bag_secret_key_path = File.join(chef_dir, "encrypted_data_bag_secret")
