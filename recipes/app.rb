@@ -17,8 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "nexus::_common_system"
-include_recipe "java"
+include_recipe 'nexus::_common_system'
+include_recipe 'java'
 
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
@@ -27,22 +27,20 @@ artifact_deploy node[:nexus][:name] do
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
-  symlinks({
-    "log" => "#{node[:nexus][:bundle_name]}/logs",
-    "tmp" => "#{node[:nexus][:bundle_name]}/tmp"
-  })
+  symlinks('log' => "#{node[:nexus][:bundle_name]}/logs",
+           'tmp' => "#{node[:nexus][:bundle_name]}/tmp")
 
-  before_extract Proc.new {
-    service "nexus" do
+  before_extract proc {
+    service 'nexus' do
       action :stop
-      only_if do File.exist?("/etc/init.d/nexus") end
+      only_if { File.exist?('/etc/init.d/nexus') }
     end
   }
 
-  before_symlink Proc.new {
+  before_symlink proc {
     nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
 
-    [ "#{nexus_home}/logs", "#{nexus_home}/tmp" ].each do |dir|
+    ["#{nexus_home}/logs", "#{nexus_home}/tmp"].each do |dir|
       directory dir do
         recursive true
         action :delete
@@ -50,13 +48,12 @@ artifact_deploy node[:nexus][:name] do
     end
   }
 
-  configure Proc.new {
-
+  configure proc {
     nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
-    conf_dir   = ::File.join(nexus_home, "conf")
-    bin_dir    = ::File.join(nexus_home, "bin")
+    conf_dir   = ::File.join(nexus_home, 'conf')
+    bin_dir    = ::File.join(nexus_home, 'bin')
 
-    [ node[:nexus][:pid_dir], node[:nexus][:work_dir] ].each do |dir|
+    [node[:nexus][:pid_dir], node[:nexus][:work_dir]].each do |dir|
       directory dir do
         owner     node[:nexus][:user]
         group     node[:nexus][:user]
@@ -65,21 +62,21 @@ artifact_deploy node[:nexus][:name] do
     end
 
     template "#{bin_dir}/#{node[:nexus][:name]}" do
-      source "nexus.erb"
+      source 'nexus.erb'
       owner  node[:nexus][:user]
       group  node[:nexus][:group]
-      mode   "0775"
+      mode   '0775'
       variables(
         :nexus_user => node[:nexus][:user],
         :nexus_pid  => node[:nexus][:pid_dir]
       )
     end
-    
+
     template "#{conf_dir}/nexus.properties" do
-      source "nexus.properties.erb"
+      source 'nexus.properties.erb'
       owner  node[:nexus][:user]
       group  node[:nexus][:group]
-      mode   "0775"
+      mode   '0775'
       variables(
         :nexus_port         => node[:nexus][:port],
         :nexus_host         => node[:nexus][:host],
@@ -90,21 +87,21 @@ artifact_deploy node[:nexus][:name] do
     end
 
     template "#{conf_dir}/jetty.xml" do
-      source "jetty.xml.erb"
+      source 'jetty.xml.erb'
       owner  node[:nexus][:user]
       group  node[:nexus][:group]
-      mode   "0775"
+      mode   '0775'
       variables(
-        :loopback  => node[:nexus][:app_server][:jetty][:loopback]
+        :loopback => node[:nexus][:app_server][:jetty][:loopback]
       )
     end
 
-    link "/etc/init.d/nexus" do
+    link '/etc/init.d/nexus' do
       to "#{bin_dir}/#{node[:nexus][:name]}"
     end
   }
 end
 
-service "nexus" do
-  action   [:enable, :start]
+service 'nexus' do
+  action [:enable, :start]
 end

@@ -25,7 +25,7 @@ end
 
 user node[:nexus][:group] do
   gid    node[:nexus][:group]
-  shell  "/bin/bash"
+  shell  '/bin/bash'
   home   user_home
   system true
 end
@@ -33,6 +33,6 @@ end
 directory user_home do
   owner  node[:nexus][:user]
   group  node[:nexus][:group]
-  mode   "0755"
+  mode   '0755'
   action :create
 end

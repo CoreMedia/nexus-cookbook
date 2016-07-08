@@ -22,4 +22,4 @@ actions :set_level
 default_action :set_level
 
 attribute :name, :kind_of => String, :name_attribute => true
-attribute :level, :kind_of => String, :equal_to => %w(trace debug info warn error off default), :default => "info"
+attribute :level, :kind_of => String, :equal_to => %w(trace debug info warn error off default), :default => 'info'

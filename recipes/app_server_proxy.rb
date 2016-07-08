@@ -17,30 +17,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "nexus::_common_system"
-include_recipe "nginx"
+include_recipe 'nexus::_common_system'
+include_recipe 'nginx'
 
 directory "#{node[:nginx][:dir]}/shared/certificates" do
-  owner     "root"
-  group     "root"
-  mode      "700"
+  owner     'root'
+  group     'root'
+  mode      '700'
   recursive true
 end
 
 if node[:nexus][:app_server_proxy][:use_self_signed]
-  log "Using default (self signed) certificate." do
+  log 'Using default (self signed) certificate.' do
     level :warn
   end
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    source "self_signed_cert.crt"
-    mode   "600"
+    source 'self_signed_cert.crt'
+    mode   '600'
     action :create
   end
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    source "self_signed_key.key"
-    mode   "600"
+    source 'self_signed_key.key'
+    mode   '600'
     action :create
   end
 else
@@ -57,22 +57,22 @@ else
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     content certificate
-    mode    "600"
+    mode    '600'
     action :create
   end
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     content key
-    mode    "600"
+    mode    '600'
     action  :create
   end
 end
 
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
-  source "nexus_proxy.nginx.conf.erb"
-  owner  "root"
-  group  "root"
-  mode   "0644"
+  source 'nexus_proxy.nginx.conf.erb'
+  owner  'root'
+  group  'root'
+  mode   '0644'
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
     :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
@@ -88,6 +88,6 @@ end
 nginx_site 'nexus_proxy.conf'
 
 # Remove nginx default site
-nginx_site "default" do
+nginx_site 'default' do
   enable false
 end

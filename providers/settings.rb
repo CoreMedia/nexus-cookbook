@@ -22,9 +22,9 @@ def load_current_resource
   @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
   @current_resource.value new_resource.value
 
-  run_context.include_recipe "nexus::cli"
+  run_context.include_recipe 'nexus::cli'
   Chef::Nexus.ensure_nexus_available(node)
-  
+
   @current_resource
 end
 
@@ -37,21 +37,21 @@ end
 
 private
 
-  def path_value_equals?(value)
-    require 'jsonpath'
-    json = JSON.parse(get_nexus_settings_json)
-    path_value = JsonPath.new("$..#{new_resource.path}").on(json).first
-    path_value == value
-  end
+def path_value_equals?(value)
+  require 'jsonpath'
+  json = JSON.parse(get_nexus_settings_json)
+  path_value = JsonPath.new("$..#{new_resource.path}").on(json).first
+  path_value == value
+end
 
-  def get_nexus_settings_json
-    Chef::Nexus.nexus(node).get_global_settings_json
-  end
+def get_nexus_settings_json
+  Chef::Nexus.nexus(node).get_global_settings_json
+end
 
-  def update_nexus_settings_json
-    require 'json'
-    hashed_settings = JSON.parse(get_nexus_settings_json)
-    *path_elements, setting_to_update = new_resource.path.split(".")
-    path_elements.inject(hashed_settings, :fetch)[setting_to_update] = new_resource.value
-    Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(hashed_settings))
-  end
+def update_nexus_settings_json
+  require 'json'
+  hashed_settings = JSON.parse(get_nexus_settings_json)
+  *path_elements, setting_to_update = new_resource.path.split('.')
+  path_elements.inject(hashed_settings, :fetch)[setting_to_update] = new_resource.value
+  Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(hashed_settings))
+end
