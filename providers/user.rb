@@ -61,7 +61,7 @@ private
 def user_exists?(username)
   Chef::Nexus.nexus(node).get_user(username)
   true
-rescue NexusCli::UserNotFoundException => e
+rescue NexusCli::UserNotFoundException
   return false
 end
 
@@ -71,11 +71,11 @@ end
 
 def create_user
   validate_create_user
-  Chef::Nexus.nexus(node).create_user(get_params)
+  Chef::Nexus.nexus(node).create_user(params)
 end
 
 def update_user
-  Chef::Nexus.nexus(node).update_user(get_params(true))
+  Chef::Nexus.nexus(node).update_user(params(true))
 end
 
 def delete_user
@@ -84,9 +84,10 @@ end
 
 def change_password
   validate_change_password
-  Chef::Nexus.nexus(node).change_password(get_password_params)
+  Chef::Nexus.nexus(node).change_password(password_params)
 end
 
+# rubocop:disable Metrics/AbcSize
 def validate_create_user
   Chef::Application.fatal!('nexus_user create requires an email address.', 1) if new_resource.email.nil?
   Chef::Application.fatal!('nexus_user create requires a enabled.', 1) if new_resource.enabled.nil?
@@ -98,7 +99,7 @@ def validate_change_password
   Chef::Application.fatal!('nexus_user change_password requires a new password') if new_resource.password.nil?
 end
 
-def get_params(update = false)
+def params(update = false)
   params = { :userId => new_resource.username }
   params[:firstName] = new_resource.first_name
   params[:lastName] = new_resource.last_name
@@ -113,7 +114,7 @@ def get_params(update = false)
   params
 end
 
-def get_password_params
+def password_params
   params = { :userId => new_resource.username }
   params[:oldPassword] = new_resource.old_password
   params[:newPassword] = new_resource.password

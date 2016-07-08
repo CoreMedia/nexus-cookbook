@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 #
+# rubocop:disable Metrics/ModuleLength
 class Chef
   module Nexus
     DEFAULT_DATABAG       = 'nexus'.freeze
@@ -73,6 +74,7 @@ class Chef
       # @param  node [Chef::Node] the node
       #
       # @return [NexusCli::RemoteFactory] a connection to a Nexus server
+      # rubocop:disable Metrics/AbcSize
       def nexus(node)
         require 'nexus_cli'
         credentials_entry = get_credentials(node)
@@ -86,7 +88,7 @@ class Chef
           begin
             merged_credentials = overrides.merge(default_credentials)
             NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
-          rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+          rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException
             merged_credentials = overrides.merge(updated_credentials)
             NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
           end
@@ -123,7 +125,7 @@ class Chef
         begin
           remote = anonymous_nexus_remote(node)
           return remote.status['state'] == 'STARTED'
-        rescue Errno::ECONNREFUSED, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+        rescue Errno::ECONNREFUSED, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException
           if retries > 0
             retries -= 1
             Chef::Log.info "Could not connect to Nexus, #{retries} attempt(s) left"
@@ -147,9 +149,9 @@ class Chef
         url = generate_nexus_url(node)
         overrides = { 'url' => url, 'repository' => node[:nexus][:cli][:repository], 'username' => username, 'password' => password }
         begin
-          nexus = NexusCli::RemoteFactory.create(overrides, node[:nexus][:cli][:ssl][:verify])
+          NexusCli::RemoteFactory.create(overrides, node[:nexus][:cli][:ssl][:verify])
           true
-        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException
           false
         end
       end
@@ -217,13 +219,13 @@ class Chef
           item = Chef::EncryptedDataBagItem.load(data_bag, data_bag_item)
         end
         Mash.from_hash(item.to_hash)
-      rescue Net::HTTPServerException => e
+      rescue Net::HTTPServerException
         nil
 
       # chef_data_bag_item.rb fails to handle scenario of missing data bag :-(,
       # it reports this as Chef::Exceptions::ValidationFailed exception.
       # Adding a different rescue block if things exception needs to be handled differently
-      rescue Chef::Exceptions::ValidationFailed => e
+      rescue Chef::Exceptions::ValidationFailed
         nil
       end
     end

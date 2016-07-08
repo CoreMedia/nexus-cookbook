@@ -65,9 +65,11 @@ def smart_proxy_enabled?
   json['data']['enabled'] == true
 end
 
+# rubocop:disable Metrics/AbcSize
 def smart_proxy_enabled_same_settings?
   require 'json'
-  json = JSON.parse(Chef::Nexus.nexus(node).get_smart_proxy_settings)
+  settings = Chef::Nexus.nexus(node).get_smart_proxy_settings
+  json = JSON.parse(settings)
   enabled = json['data']['enabled']
   host = json['data']['host']
   port = json['data']['port']

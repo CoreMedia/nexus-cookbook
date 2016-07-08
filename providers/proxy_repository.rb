@@ -94,6 +94,6 @@ end
 def repository_exists?(name)
   Chef::Nexus.nexus(node).get_repository_info(name)
   true
-rescue NexusCli::RepositoryNotFoundException => e
+rescue NexusCli::RepositoryNotFoundException
   return false
 end

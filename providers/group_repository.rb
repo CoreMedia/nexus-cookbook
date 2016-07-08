@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 
+# rubocop:disable Metrics/AbcSize
 def load_current_resource
   @current_resource = Chef::Resource::NexusGroupRepository.new(new_resource.name)
 
@@ -65,7 +66,7 @@ private
 def group_repository_exists?(name)
   Chef::Nexus.nexus(node).get_group_repository(name)
   true
-rescue NexusCli::RepositoryNotFoundException => e
+rescue NexusCli::RepositoryNotFoundException
   return false
 end
 

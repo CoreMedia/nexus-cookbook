@@ -66,7 +66,8 @@ class Default < Thor
 
   def sh(cmd, dir = source_root, &block)
     out, code = sh_with_excode(cmd, dir, &block)
-    code == 0 ? out : raise(out.empty? ? "Running `#{cmd}` failed. Run this command directly for more detailed output." : out)
+    msg = out.empty? ? "Running `#{cmd}` failed. Run this command directly for more detailed output." : out
+    code == 0 ? out : raise(msg)
   end
 
   def sh_with_excode(cmd, dir = source_root, &block)
@@ -75,9 +76,7 @@ class Default < Thor
 
     Dir.chdir(dir) do
       outbuf = `#{cmd}`
-      if $CHILD_STATUS == 0
-        yield(outbuf) if block
-      end
+      yield(outbuf) if $CHILD_STATUS == 0 && block
     end
 
     [outbuf, $CHILD_STATUS]
